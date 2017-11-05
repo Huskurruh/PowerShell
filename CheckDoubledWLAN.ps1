@@ -8,11 +8,13 @@ $script:listARP = New-Object System.Collections.Generic.HashSet[long]
 function Read-WLAN {
     $file = Get-Content -Path "B:\MacAddressSuspectMatch\src\macaddresssuspectmatch\wlan.txt"
     $i = 0
+
     foreach ($line in $file) {
-        $line | Where-Object -FilterScript { $_ -match "[a-z0-9][a-z0-9]:[a-z0-9][a-z0-9]:[a-z0-9][a-z0-9]:[a-z0-9][a-z0-9]:[a-z0-9][a-z0-9]:[a-z0-9][a-z0-9]" } | ForEach-Object {
-            $read = $_.split(" ")[0]
+        if ($line -match "[a-z0-9][a-z0-9]:[a-z0-9][a-z0-9]:[a-z0-9][a-z0-9]:[a-z0-9][a-z0-9]:[a-z0-9][a-z0-9]:[a-z0-9][a-z0-9]") {
+            $read = $line.split(" ")[0]
             $null = $script:listWLAN.Add([System.Convert]::ToInt64($read.replace(":", ""), 16))
         }
+
         $i++
     }
 
@@ -22,8 +24,8 @@ function Read-ARP {
     $file = Get-Content -Path "B:\MacAddressSuspectMatch\src\macaddresssuspectmatch\arp.txt"
     $i = 0
     foreach ($line in $file) {
-        $line | Where-Object -FilterScript { $_ -match "[a-z0-9][a-z0-9][a-z0-9][a-z0-9][.][a-z0-9][a-z0-9][a-z0-9][a-z0-9][.][a-z0-9][a-z0-9][a-z0-9][a-z0-9]" } | ForEach-Object {
-            $read = $_ -split "\s{1,}"
+        if($line -match "[a-z0-9][a-z0-9][a-z0-9][a-z0-9][.][a-z0-9][a-z0-9][a-z0-9][a-z0-9][.][a-z0-9][a-z0-9][a-z0-9][a-z0-9]"){
+            $read = $line -split "\s{1,}"
             if ($read.Length -ge 3) {
                 $read = $read[3]
             }
@@ -32,6 +34,7 @@ function Read-ARP {
             }
             $null = $script:listARP.Add([System.Convert]::ToInt64($read.replace(".", ""), 16))
         }
+
         $i++
     }
     
